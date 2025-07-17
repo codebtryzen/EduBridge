@@ -106,10 +106,6 @@ def show_home():
         if st.button("🚀\n\n**Career Path**\n\nDiscover career paths based on your interests and skills.", key="career"):
             st.session_state.page = "Career Path"
 
-    with col4:
-            if st.button("📊\n\n**Scan2Quiz**\n\nUpload your Image and Get Questions.", key="scan2quiz"):
-                st.session_state.page = "scan2quiz"
-
 
     st.markdown("---")
     st.info("✨ Click any card above or use the sidebar to explore EduBridgeAI!")

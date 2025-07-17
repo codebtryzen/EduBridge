@@ -5,7 +5,6 @@ import home
 import quiz_generator
 import translator
 import recommender
-import scan2quiz  
 st.set_page_config(page_title="EduBridgeAI", layout="wide")
 
 # Sidebar navigation

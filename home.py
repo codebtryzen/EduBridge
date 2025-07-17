@@ -106,9 +106,5 @@ def show_home():
         if st.button("🚀\n\n**Career Path**\n\nDiscover career paths based on your interests and skills.", key="career"):
             st.session_state.page = "Career Path"
 
-    with col4:
-        if st.button("📊\n\n**Progress**\n\nTrack your learning progress and see improvements.", key="progress"):
-            st.session_state.page = "Progress"
-
     st.markdown("---")
     st.info("✨ Click any card above or use the sidebar to explore EduBridgeAI!")

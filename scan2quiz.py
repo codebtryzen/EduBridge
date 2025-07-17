@@ -6,14 +6,14 @@ from transformers import pipeline
 # Set Tesseract path for Windows
 pytesseract.pytesseract.tesseract_cmd = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
 
-# Load models (can be cached for performance)
+# Load models (cached for performance)
 @st.cache_resource
 def get_summarizer():
     return pipeline("summarization", model="facebook/bart-large-cnn")
 
 @st.cache_resource
 def get_qa_generator():
-    return pipeline("text2text-generation", model="valhalla/t5-base-qg-hl")
+    return pipeline("text2text-generation", model="t5-small")  # ✅ Replaced with lightweight compatible model
 
 summarizer = get_summarizer()
 qa_generator = get_qa_generator()
@@ -44,7 +44,7 @@ def scan_and_generate_quiz():
             st.write(summary)
 
             with st.spinner("🧠 Generating quiz questions..."):
-                questions = qa_generator("generate questions: " + summary, max_length=128, do_sample=True, top_k=50)
+                questions = qa_generator("generate questions: " + summary, max_length=128, do_sample=True)
 
             st.subheader("🧠 Generated Quiz Questions:")
             for i, q in enumerate(questions):

@@ -9,7 +9,7 @@ import scan2quiz
 st.set_page_config(page_title="EduBridgeAI", layout="wide")
 
 # Sidebar navigation
-menu = ["Home", "Quiz", "Translate", "Career Path", "Scan2Quiz"]
+menu = ["Home", "Quiz", "Translate", "Career Path"]
 
 if "page" not in st.session_state:
     st.session_state.page = "Home"
@@ -28,7 +28,5 @@ try:
         translator.translate_ui()
     elif st.session_state.page == "Career Path":
         recommender.show_recommendations()
-    elif st.session_state.page == "Scan2Quiz":
-        scan2quiz.scan_and_generate_quiz()  # ✅ This now works
 except Exception as e:
     st.error(f"An error occurred: {e}")

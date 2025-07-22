@@ -1,3 +1,5 @@
+# home.py
+
 import streamlit as st
 
 def show_home():
@@ -9,8 +11,8 @@ def show_home():
             background: linear-gradient(90deg, #00b09b, #96c93d);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 0.4em;
             text-align: center;
+            margin-bottom: 0.5em;
         }
         .tagline {
             font-size: 1.4em;
@@ -33,51 +35,11 @@ def show_home():
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
-        .feature-icon {
-            font-size: 3em;
-            margin-bottom: 10px;
-            color: #2196F3;
-        }
-
-        /* Button background images */
-        div[data-testid="stButton"][key="quiz"] > button {
-            background-image: url("https://cdn-icons-png.flaticon.com/512/3135/3135715.png");
-            background-size: cover;
-            background-position: center;
-            background-color: rgba(0,0,0,0.4);
-            background-blend-mode: overlay;
-        }
-        div[data-testid="stButton"][key="translate"] > button {
-            background-image: url("https://cdn-icons-png.flaticon.com/512/484/484582.png");
-            background-size: cover;
-            background-position: center;
-            background-color: rgba(0,0,0,0.4);
-            background-blend-mode: overlay;
-        }
-        div[data-testid="stButton"][key="career"] > button {
-            background-image: url("https://cdn-icons-png.flaticon.com/512/2620/2620999.png");
-            background-size: cover;
-            background-position: center;
-            background-color: rgba(0,0,0,0.4);
-            background-blend-mode: overlay;
-        }
-        div[data-testid="stButton"][key="progress"] > button {
-            background-image: url("https://cdn-icons-png.flaticon.com/512/3135/3135719.png");
-            background-size: cover;
-            background-position: center;
-            background-color: rgba(0,0,0,0.4);
-            background-blend-mode: overlay;
-        }
         </style>
     """, unsafe_allow_html=True)
 
     st.markdown("<div class='big-title'>EduBridgeAI</div>", unsafe_allow_html=True)
     st.markdown("<div class='tagline'>Empowering rural learners through personalized AI education</div>", unsafe_allow_html=True)
-
-    # st.image(
-    #     "https://images.unsplash.com/photo-1581091226825-0ef34f62d2d8?fit=crop&w=1200&h=400",
-    #     use_container_width=True
-    # )
 
     st.markdown("### Why EduBridgeAI?")
     st.write("""
@@ -88,24 +50,31 @@ def show_home():
         - **Progress Tracking** to keep them motivated.
     """)
 
-    st.markdown("## Explore Features")
+    st.markdown("---")
+    st.markdown("## 🚀 Explore Features")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("📝\n\n**Quiz**\n\nTest your knowledge with interactive AI quizzes.", key="quiz"):
+        if st.button("📝 Quiz\nTest your knowledge", key="quiz"):
             st.session_state.page = "Quiz"
+            st.rerun()
 
     with col2:
-        if st.button("🌐\n\n**Translate**\n\nTranslate learning content into regional languages.", key="translate"):
+        if st.button("🌐 Translate\nRegional languages", key="translate"):
             st.session_state.page = "Translate"
+            st.rerun()
 
     col3, col4 = st.columns(2)
 
     with col3:
-        if st.button("🚀\n\n**Career Path**\n\nDiscover career paths based on your interests and skills.", key="career"):
+        if st.button("🚀 Career Path\nBased on your skills", key="career"):
             st.session_state.page = "Career Path"
+            st.rerun()
 
+    with col4:
+        if st.button("📄 Scan Notes\nConvert to Q&A", key="scan_notes"):
+            st.session_state.page = "Scan Notes"
+            st.rerun()
 
-    st.markdown("---")
     st.info("✨ Click any card above or use the sidebar to explore EduBridgeAI!")

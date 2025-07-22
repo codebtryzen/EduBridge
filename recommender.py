@@ -152,6 +152,8 @@ def show_recommendations():
     elif degree == "Other":
         st.info("Please enter your degree and interests in detail so we can help you better.")
 
+
+
 # Call the function to run it
 if __name__ == "__main__":
     show_recommendations()

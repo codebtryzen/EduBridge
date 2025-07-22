@@ -71,34 +71,124 @@ quiz_bank = {
 
 # --------------- 2. Quiz UI Logic ---------------
 
+
 def generate_quiz():
+    # ---------- 🎨 Gradient Animation Title & Line ----------
     st.markdown(
-        "<h1 style='text-align: center; color: #4CAF50;'>🧠 AI Quiz Game</h1>",
-        unsafe_allow_html=True
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
+        .quiz-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 0 0 0.4em;
+            background: linear-gradient(270deg, #00c6ff, #0072ff, #8e2de2, #4a00e0, #00c6ff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 9s ease infinite;
+        }
+
+        .gradient-line {
+            height: 4px;
+            width: 100%;
+            border: none;
+            background: linear-gradient(270deg, #00c6ff, #0072ff, #8e2de2, #4a00e0, #00c6ff);
+            background-size: 400% 400%;
+            animation: gradientShift 9s ease infinite;
+            margin: 0 auto 2rem;
+        }
+
+        @keyframes gradientShift {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
     )
-    st.markdown("<hr style='border: 2px solid #4CAF50;'>", unsafe_allow_html=True)
 
-    categories = list(quiz_bank.keys())
-    chosen_cat = st.selectbox(
-        "📚 Select a Category",
-        categories,
-        index=0
-    )
+    st.markdown('<h1 class="quiz-title">🧠 AI Quiz Game</h1>', unsafe_allow_html=True)
+    st.markdown('<hr class="gradient-line">', unsafe_allow_html=True)
 
-    if "current_cat" not in st.session_state or st.session_state.current_cat != chosen_cat:
-        st.session_state.current_cat = chosen_cat
-        st.session_state.remaining_questions = quiz_bank[chosen_cat][:]
-        random.shuffle(st.session_state.remaining_questions)
-        st.session_state.current_q_index = 0
-        st.session_state.answered = False
-        st.session_state.feedback = ""
-        st.session_state.selected_option = None
-        st.session_state.correct_count = 0
-        st.session_state.incorrect_count = 0
+    # 👇 rest of your quiz logic stays as-is
 
+
+    # 👉 If no category picked yet → show selector
+    if "current_cat" not in st.session_state:
+        categories = list(quiz_bank.keys())
+        chosen_cat = st.selectbox(
+            "📚 Select a Category to Start",
+            ["-- Select --"] + categories,
+            index=0
+        )
+
+        if chosen_cat != "-- Select --":
+            st.session_state.current_cat = chosen_cat
+            st.session_state.remaining_questions = quiz_bank[chosen_cat][:]
+            random.shuffle(st.session_state.remaining_questions)
+            st.session_state.current_q_index = 0
+            st.session_state.answered = False
+            st.session_state.feedback = ""
+            st.session_state.selected_option = None
+            st.session_state.correct_count = 0
+            st.session_state.incorrect_count = 0
+            st.session_state.shuffled_questions = []
+            st.rerun()
+
+        else:
+            st.info("Please select a category to start the quiz.")
+            return
+
+    else:
+        # ✅ BACK ARROW top left with HTML + simple style
+        st.markdown("""
+            <style>
+                .back-arrow {
+                    position: fixed;
+                    top: 15px;
+                    left: 15px;
+                    font-size: 24px;
+                    color: white;
+                    text-decoration: none;
+                    background: none;
+                }
+                .back-arrow:hover {
+                    color: #4CAF50;
+                    cursor: pointer;
+                }
+            </style>
+            <a href="#" class="back-arrow" onclick="window.location.reload();">←</a>
+        """, unsafe_allow_html=True)
+
+        if st.button("🔙"):
+            for key in ["current_cat", "remaining_questions", "current_q_index",
+                        "answered", "feedback", "selected_option",
+                        "correct_count", "incorrect_count", "shuffled_questions"]:
+                if key in st.session_state:
+                    del st.session_state[key]
+            st.rerun()
+
+    # 👉 Show questions
     if st.session_state.current_q_index < len(st.session_state.remaining_questions):
+
         q_index = st.session_state.current_q_index
-        q_dict = st.session_state.remaining_questions[q_index]
+
+        if len(st.session_state.shuffled_questions) <= q_index:
+            q_dict = st.session_state.remaining_questions[q_index]
+            options = q_dict["options"][:]
+            random.shuffle(options)
+            st.session_state.shuffled_questions.append({
+                "question": q_dict["question"],
+                "options": options,
+                "correct_answer": q_dict["answer"]
+            })
+
+        q_dict = st.session_state.shuffled_questions[q_index]
 
         st.markdown(
             f"<h3 style='color:#1976D2;'>Question {q_index + 1} of {len(st.session_state.remaining_questions)}</h3>",
@@ -123,11 +213,11 @@ def generate_quiz():
             if st.button("✅ Submit Answer", use_container_width=True, disabled=st.session_state.answered or selected is None):
                 st.session_state.answered = True
                 st.session_state.selected_option = selected
-                if selected == q_dict["answer"]:
+                if selected == q_dict["correct_answer"]:
                     st.session_state.feedback = "✅ **Correct! Great job.**"
                     st.session_state.correct_count += 1
                 else:
-                    st.session_state.feedback = f"❌ **Incorrect.** The correct answer is **{q_dict['answer']}**."
+                    st.session_state.feedback = f"❌ **Incorrect.** The correct answer is **{q_dict['correct_answer']}**."
                     st.session_state.incorrect_count += 1
 
         with col_next:
@@ -147,7 +237,7 @@ def generate_quiz():
         st.success("🎉 You have completed the quiz!")
         show_dashboard()
 
-# --------------- 3. Dashboard ---------------
+# ---------------- 3. Dashboard ----------------
 
 def show_dashboard():
     correct = st.session_state.get("correct_count", 0)
@@ -188,8 +278,11 @@ def show_dashboard():
 
     with col1:
         if st.button("🔄 Retry Quiz", use_container_width=True):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
+            for key in ["current_cat", "remaining_questions", "current_q_index",
+                        "answered", "feedback", "selected_option",
+                        "correct_count", "incorrect_count", "shuffled_questions"]:
+                if key in st.session_state:
+                    del st.session_state[key]
             st.rerun()
 
     with col2:
@@ -198,7 +291,7 @@ def show_dashboard():
         c.setFont("Helvetica-Bold", 14)
         c.drawString(100, 780, "Quiz Performance Report")
         c.setFont("Helvetica", 12)
-        c.drawString(100, 750, f"Category: {st.session_state.current_cat}")
+        c.drawString(100, 750, f"Category: {st.session_state.get('current_cat', '-')}")
         c.drawString(100, 730, f"Correct Answers: {correct}")
         c.drawString(100, 710, f"Incorrect Answers: {incorrect}")
         total = correct + incorrect
@@ -220,7 +313,7 @@ def show_dashboard():
             use_container_width=True
         )
 
-# --------------- 4. Run App ---------------
+# ---------------- 4. Run App ----------------
 
 if __name__ == "__main__":
     generate_quiz()

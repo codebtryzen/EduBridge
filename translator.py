@@ -3,6 +3,7 @@ from googletrans import Translator
 from gtts import gTTS
 import io, textwrap
 
+
 def translate_ui():
     # ---------- 🎨 Scoped CSS ----------
     st.markdown(

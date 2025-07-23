@@ -1,20 +1,47 @@
+# main.py
 import streamlit as st
 import home
 import quiz_generator
 import translator
 import recommender
 import notes_scanner
-import chatbot_ui
+from botpress_embed import load_botpress_chatbot
 
+# Set page configuration only once
 st.set_page_config(page_title="EduBridgeAI", layout="wide")
 
+# Inject custom CSS to remove whitespace and padding
+st.markdown("""
+    <style>
+        /* Remove Streamlit default padding */
+        .main > div {
+            padding-top: 0rem;
+            padding-bottom: 0rem;
+        }
+
+        .block-container {
+            padding: 1rem;
+        }
+
+        /* Hide Streamlit footer and hamburger menu */
+        footer, #MainMenu {
+            visibility: hidden;
+        }
+
+        /* Reduce sidebar spacing */
+        .css-1d391kg {
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# Sidebar Navigation
 menu = ["Home", "Quiz", "Translate", "Career Path", "Scan Notes"]
 
-# Initialize session state
 if "page" not in st.session_state:
     st.session_state.page = "Home"
 
-# Sidebar navigation
 with st.sidebar:
     st.markdown("## 📚 EduBridgeAI")
     page_choice = st.radio("Navigate", menu, index=menu.index(st.session_state.page))
@@ -22,9 +49,7 @@ with st.sidebar:
         st.session_state.page = page_choice
         st.rerun()
 
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# Page Routing
+# Route Pages
 try:
     if st.session_state.page == "Home":
         home.show_home()
@@ -44,5 +69,5 @@ try:
 except Exception as e:
     st.error(f"An error occurred: {e}")
 
-# Floating Chatbot
-chatbot_ui.chatbot_ui()
+# Load Botpress Chatbot (No extra whitespace)
+load_botpress_chatbot()

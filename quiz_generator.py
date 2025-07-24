@@ -43,19 +43,7 @@ quiz_bank = {
         {"question": "Outlier is?", "options": ["An unusual data point", "Middle value", "Average", "Clean data"], "answer": "An unusual data point"},
         {"question": "Which is used for hypothesis testing?", "options": ["t-test", "dropna", "merge", "append"], "answer": "t-test"}
     ],
-    "Python Programming": [
-        {"question": "What is a list?", "options": ["Ordered collection", "Set", "Loop", "Variable"], "answer": "Ordered collection"},
-        {"question": "Which keyword defines function?", "options": ["def", "fun", "define", "function"], "answer": "def"},
-        {"question": "Which symbol is used for comment?", "options": ["#", "//", "/*", "<!--"], "answer": "#"},
-        {"question": "What is output of print(2**3)?", "options": ["8", "6", "9", "5"], "answer": "8"},
-        {"question": "Which loop is used to iterate list?", "options": ["for", "while", "loop", "repeat"], "answer": "for"},
-        {"question": "Which data type is immutable?", "options": ["Tuple", "List", "Dict", "Set"], "answer": "Tuple"},
-        {"question": "Which module is for random numbers?", "options": ["random", "math", "time", "os"], "answer": "random"},
-        {"question": "What does len() return?", "options": ["Length of item", "Data type", "Memory size", "None"], "answer": "Length of item"},
-        {"question": "What is indentation in Python?", "options": ["Block structure", "Spacing", "Loop", "Function"], "answer": "Block structure"},
-        {"question": "Which is NOT a valid type?", "options": ["integer", "decimal", "float", "string"], "answer": "decimal"}
-    ],
-    "Cybersecurity": [
+        "Cybersecurity": [
         {"question": "What is a firewall?", "options": ["Security system", "Game", "Antivirus", "Software bug"], "answer": "Security system"},
         {"question": "Phishing means?", "options": ["Fraudulent email", "Fishing game", "Virus", "Firewall"], "answer": "Fraudulent email"},
         {"question": "What is malware?", "options": ["Malicious software", "Update file", "Antivirus", "Firewall"], "answer": "Malicious software"},
@@ -67,13 +55,12 @@ quiz_bank = {
         {"question": "What is brute-force attack?", "options": ["Password guessing", "Virus", "Firewall", "Phishing"], "answer": "Password guessing"},
         {"question": "VPN stands for?", "options": ["Virtual Private Network", "Visual Protocol Node", "Very Private Network", "Verified Private Net"], "answer": "Virtual Private Network"}
     ]
+
 }
 
 # --------------- 2. Quiz UI Logic ---------------
 
-
 def generate_quiz():
-    # ---------- 🎨 Gradient Animation Title & Line ----------
     st.markdown(
         """
         <style>
@@ -115,10 +102,6 @@ def generate_quiz():
     st.markdown('<h1 class="quiz-title">🧠 AI Quiz Game</h1>', unsafe_allow_html=True)
     st.markdown('<hr class="gradient-line">', unsafe_allow_html=True)
 
-    # 👇 rest of your quiz logic stays as-is
-
-
-    # 👉 If no category picked yet → show selector
     if "current_cat" not in st.session_state:
         categories = list(quiz_bank.keys())
         chosen_cat = st.selectbox(
@@ -145,7 +128,6 @@ def generate_quiz():
             return
 
     else:
-        # ✅ BACK ARROW top left with HTML + simple style
         st.markdown("""
             <style>
                 .back-arrow {
@@ -173,9 +155,7 @@ def generate_quiz():
                     del st.session_state[key]
             st.rerun()
 
-    # 👉 Show questions
     if st.session_state.current_q_index < len(st.session_state.remaining_questions):
-
         q_index = st.session_state.current_q_index
 
         if len(st.session_state.shuffled_questions) <= q_index:
@@ -211,14 +191,16 @@ def generate_quiz():
 
         with col_submit:
             if st.button("✅ Submit Answer", use_container_width=True, disabled=st.session_state.answered or selected is None):
-                st.session_state.answered = True
-                st.session_state.selected_option = selected
-                if selected == q_dict["correct_answer"]:
-                    st.session_state.feedback = "✅ **Correct! Great job.**"
-                    st.session_state.correct_count += 1
-                else:
-                    st.session_state.feedback = f"❌ **Incorrect.** The correct answer is **{q_dict['correct_answer']}**."
-                    st.session_state.incorrect_count += 1
+                if not st.session_state.get(f"scored_{q_index}", False):
+                    st.session_state.answered = True
+                    st.session_state.selected_option = selected
+                    if selected == q_dict["correct_answer"]:
+                        st.session_state.feedback = "✅ **Correct! Great job.**"
+                        st.session_state.correct_count += 1
+                    else:
+                        st.session_state.feedback = f"❌ **Incorrect.** The correct answer is **{q_dict['correct_answer']}**."
+                        st.session_state.incorrect_count += 1
+                    st.session_state[f"scored_{q_index}"] = True
 
         with col_next:
             if st.session_state.answered:
@@ -251,7 +233,6 @@ def show_dashboard():
     st.write(f"✅ **Correct Answers:** {correct}")
     st.write(f"❌ **Incorrect Answers:** {incorrect}")
 
-    # Pie chart
     labels = ['Correct', 'Incorrect']
     sizes = [correct, incorrect]
     colors = ['#4CAF50', '#F44336']

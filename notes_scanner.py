@@ -3,7 +3,9 @@ from PIL import Image
 import pytesseract
 import random
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
 
 def scan_notes_ui():
     st.markdown(

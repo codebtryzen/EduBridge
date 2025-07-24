@@ -3,6 +3,30 @@ from PIL import Image
 import requests
 
 def scan_notes_ui():
+    # Floating warning box using custom HTML + CSS
+    st.markdown(
+        """
+        <style>
+        .floating-warning {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        </style>
+        <div class="floating-warning">
+            ⚠️ This is just a demo. It requires API for extracting text.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
     st.markdown(
         "<h1 style='text-align:center;'>📄 Scan Notes & Generate Questions</h1>",
         unsafe_allow_html=True
@@ -27,7 +51,7 @@ def scan_notes_ui():
                     st.write(f"**Q{i}.** {q}")
 
 def extract_text_from_image(image_file):
-    api_key = "K87423003988957"  # Your actual API key
+    api_key = "K87423003988957"
     url = "https://api.ocr.space/parse/image"
 
     image_bytes = image_file.read()
@@ -63,5 +87,3 @@ def generate_questions(text):
 
 if __name__ == "__main__":
     scan_notes_ui()
-
-print("This is just a demo.Its requires API for extracting text")

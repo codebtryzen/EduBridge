@@ -1,51 +1,48 @@
 import streamlit as st
 from PIL import Image
 import pytesseract
-from transformers import pipeline
+import random
 
-# Set Tesseract path for Windows
-pytesseract.pytesseract.tesseract_cmd = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+# Set Tesseract path for Linux (Streamlit Cloud)
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
-# Load models (cached for performance)
-@st.cache_resource
-def get_summarizer():
-    return pipeline("summarization", model="facebook/bart-large-cnn")
+def scan_notes_ui():
+    st.markdown(
+        "<h1 style='text-align:center;'>📄 Scan Notes & Generate Questions</h1>",
+        unsafe_allow_html=True
+    )
 
-@st.cache_resource
-def get_qa_generator():
-    return pipeline("text2text-generation", model="t5-small")  # ✅ Replaced with lightweight compatible model
-
-summarizer = get_summarizer()
-qa_generator = get_qa_generator()
-
-def scan_and_generate_quiz():
-    st.title("📷 Scan-2-Quiz: AI from Image to MCQs")
-    uploaded_file = st.file_uploader("Upload textbook image or handwritten note", type=["jpg", "png", "jpeg"])
+    uploaded_file = st.file_uploader("Upload your handwritten or printed notes image:", type=["png", "jpg", "jpeg"])
 
     if uploaded_file:
         image = Image.open(uploaded_file)
-        st.image(image, caption="Uploaded Image", use_column_width=True)
+        st.image(image, caption='Uploaded Notes', use_container_width=True)
 
-        if st.button("Generate Quiz"):
-            with st.spinner("🔍 Extracting text from image..."):
+        if st.button("🔍 Scan & Generate Questions"):
+            with st.spinner("Extracting text and generating questions..."):
                 extracted_text = pytesseract.image_to_string(image)
 
-            st.subheader("📄 Extracted Text:")
-            st.text_area("Text", extracted_text, height=200)
+                st.subheader("Extracted Text:")
+                st.write(extracted_text)
 
-            if len(extracted_text.strip()) < 30:
-                st.warning("⚠️ Not enough text to summarize.")
-                return
+                st.subheader("Generated Questions:")
+                questions = generate_questions(extracted_text)
+                for i, q in enumerate(questions, 1):
+                    st.write(f"**Q{i}.** {q}")
 
-            with st.spinner("✍️ Summarizing content..."):
-                summary = summarizer(extracted_text, max_length=80, min_length=30, do_sample=False)[0]['summary_text']
+def generate_questions(text):
+    # Very simple mock logic — you can improve this with NLP
+    sentences = text.split('.')
+    questions = []
+    for s in sentences:
+        s = s.strip()
+        if len(s.split()) > 4:
+            questions.append(f"What is meant by: '{s[:40]}...'?")
+        if len(questions) >= 5:
+            break
+    if not questions:
+        questions.append("Could not generate questions — please upload clearer notes.")
+    return questions
 
-            st.subheader("📝 Summary:")
-            st.write(summary)
-
-            with st.spinner("🧠 Generating quiz questions..."):
-                questions = qa_generator("generate questions: " + summary, max_length=128, do_sample=True)
-
-            st.subheader("🧠 Generated Quiz Questions:")
-            for i, q in enumerate(questions):
-                st.markdown(f"**Q{i+1}:** {q['generated_text']}")
+if __name__ == "__main__":
+    scan_notes_ui()

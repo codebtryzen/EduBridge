@@ -1,11 +1,6 @@
 import streamlit as st
 from PIL import Image
-import pytesseract
-import random
-
-
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-
+import requests
 
 def scan_notes_ui():
     st.markdown(
@@ -21,7 +16,7 @@ def scan_notes_ui():
 
         if st.button("🔍 Scan & Generate Questions"):
             with st.spinner("Extracting text and generating questions..."):
-                extracted_text = pytesseract.image_to_string(image)
+                extracted_text = extract_text_from_image(uploaded_file)
 
                 st.subheader("Extracted Text:")
                 st.write(extracted_text)
@@ -31,8 +26,29 @@ def scan_notes_ui():
                 for i, q in enumerate(questions, 1):
                     st.write(f"**Q{i}.** {q}")
 
+def extract_text_from_image(image_file):
+    api_key = "K87423003988957"  # Your actual API key
+    url = "https://api.ocr.space/parse/image"
+
+    image_bytes = image_file.read()
+    result = requests.post(
+        url,
+        files={"filename": image_bytes},
+        data={
+            "apikey": api_key,
+            "language": "eng",
+            "isOverlayRequired": False
+        }
+    )
+
+    try:
+        result_json = result.json()
+        parsed_text = result_json["ParsedResults"][0]["ParsedText"]
+        return parsed_text.strip()
+    except Exception as e:
+        return f"❌ Could not extract text. Error: {str(e)}"
+
 def generate_questions(text):
-    # Very simple mock logic — you can improve this with NLP
     sentences = text.split('.')
     questions = []
     for s in sentences:

@@ -63,3 +63,5 @@ def generate_questions(text):
 
 if __name__ == "__main__":
     scan_notes_ui()
+
+print("This is just a demo.Its requires API for extracting text")
